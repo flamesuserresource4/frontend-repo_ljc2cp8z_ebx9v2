@@ -7,13 +7,18 @@ import {
   CheckCircle2,
   XCircle,
   RefreshCw,
+  Sprout,
+  Compass,
+  Target,
+  Rocket,
 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const LEVELS = [
-  { key: 'A1', label: 'A1', desc: 'Beginner' },
-  { key: 'A2', label: 'A2', desc: 'Elementary' },
-  { key: 'B1', label: 'B1', desc: 'Intermediate' },
-  { key: 'B2', label: 'B2', desc: 'Upper Intermediate' },
+  { key: 'A1', label: 'A1', desc: 'Beginner', Icon: Sprout, color: 'emerald' },
+  { key: 'A2', label: 'A2', desc: 'Elementary', Icon: Compass, color: 'sky' },
+  { key: 'B1', label: 'B1', desc: 'Intermediate', Icon: Target, color: 'violet' },
+  { key: 'B2', label: 'B2', desc: 'Upper Intermediate', Icon: Rocket, color: 'amber' },
 ]
 
 const TOPICS = ['Travel', 'Technology', 'Business', 'Lifestyle', 'Health']
@@ -78,6 +83,19 @@ const VOCAB = [
   { word: 'Shared', def: 'Used or enjoyed by a group of people.' },
 ]
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+  },
+}
+
+const item = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
+}
+
 function App() {
   const [step, setStep] = useState(1) // 1: Onboarding, 2: Reading, 3: Quiz, 4: Results
   const [level, setLevel] = useState(null)
@@ -125,284 +143,318 @@ function App() {
       <div className="mx-auto max-w-4xl px-4 py-10 md:py-14">
         {/* Header */}
         <header className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex items-center gap-3">
             <div className="rounded-xl bg-sky-100 p-2 text-sky-600 shadow-sm"><GraduationCap className="h-6 w-6" /></div>
             <div>
               <h1 className="text-xl font-semibold tracking-tight">English Reader</h1>
               <p className="text-sm text-slate-500">Personalized reading, simple practice</p>
             </div>
-          </div>
-          <div className="hidden md:flex items-center gap-2 text-sky-600">
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }} className="hidden md:flex items-center gap-2 text-sky-600">
             <Sparkles className="h-5 w-5" />
             <span className="text-sm">Learn by reading</span>
-          </div>
+          </motion.div>
         </header>
 
         {/* Card Container */}
-        <div className="rounded-2xl bg-white/80 shadow-xl ring-1 ring-black/5 backdrop-blur-sm">
-          {/* Onboarding */}
-          {step === 1 && (
-            <div className="p-6 md:p-8">
-              <div className="mb-6 flex items-center gap-3">
-                <BookOpen className="h-6 w-6 text-emerald-600" />
-                <h2 className="text-lg font-semibold">Choose your level and topics</h2>
-              </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35 }}
+            className="rounded-2xl bg-white/80 shadow-xl ring-1 ring-black/5 backdrop-blur-sm"
+          >
+            {/* Onboarding */}
+            {step === 1 && (
+              <div className="p-6 md:p-8">
+                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6 flex items-center gap-3">
+                  <BookOpen className="h-6 w-6 text-emerald-600" />
+                  <h2 className="text-lg font-semibold">Choose your level and topics</h2>
+                </motion.div>
 
-              {/* Levels */}
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {LEVELS.map((l) => {
-                  const active = level === l.key
-                  return (
-                    <button
-                      key={l.key}
-                      onClick={() => setLevel(l.key)}
-                      className={`group rounded-xl border p-4 text-left transition shadow-sm hover:shadow-md ${
-                        active
-                          ? 'border-emerald-400 bg-emerald-50'
-                          : 'border-slate-200 bg-white'
-                      }`}
-                    >
-                      <div className={`mb-2 inline-flex items-center rounded-lg px-2 py-1 text-xs ${
-                        active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {l.desc}
-                      </div>
-                      <div className="flex items-end justify-between">
-                        <span className="text-2xl font-bold tracking-tight">{l.label}</span>
-                        <span className={`text-xs ${active ? 'text-emerald-600' : 'text-slate-400'}`}>CEFR</span>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+                {/* Levels */}
+                <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  {LEVELS.map((l, idx) => {
+                    const active = level === l.key
+                    const Icon = l.Icon
+                    const color = l.color
+                    const colorBg = active ? `bg-${color}-50` : 'bg-white'
+                    const colorBorder = active ? `border-${color}-300` : 'border-slate-200'
+                    const colorPill = active ? `bg-${color}-100 text-${color}-700` : 'bg-slate-100 text-slate-600'
 
-              {/* Topics */}
-              <div className="mt-8">
-                <p className="mb-3 text-sm font-medium text-slate-600">Pick one or more topics</p>
-                <div className="flex flex-wrap gap-2">
-                  {TOPICS.map((t) => {
-                    const active = topics.includes(t)
                     return (
-                      <button
-                        type="button"
-                        key={t}
-                        onClick={() => toggleTopic(t)}
-                        className={`rounded-full border px-4 py-2 text-sm transition ${
-                          active
-                            ? 'border-sky-300 bg-sky-50 text-sky-700 shadow-sm'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
+                      <motion.button
+                        variants={item}
+                        whileHover={{ y: -2, scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        key={l.key}
+                        onClick={() => setLevel(l.key)}
+                        className={`group rounded-xl border p-4 text-left transition shadow-sm hover:shadow-md ${colorBorder} ${colorBg}`}
                       >
-                        {t}
-                      </button>
+                        <div className={`mb-3 inline-flex items-center gap-2 rounded-lg px-2 py-1 text-xs ${colorPill}`}>
+                          <Icon className="h-4 w-4" />
+                          {l.desc}
+                        </div>
+                        <div className="flex items-end justify-between">
+                          <span className="text-2xl font-bold tracking-tight">{l.label}</span>
+                          <span className={`text-xs ${active ? `text-${color}-600` : 'text-slate-400'}`}>CEFR</span>
+                        </div>
+                      </motion.button>
                     )
                   })}
+                </motion.div>
+
+                {/* Topics */}
+                <div className="mt-8">
+                  <p className="mb-3 text-sm font-medium text-slate-600">Pick one or more topics</p>
+                  <motion.div variants={container} initial="hidden" animate="show" className="flex flex-wrap gap-2">
+                    {TOPICS.map((t) => {
+                      const active = topics.includes(t)
+                      return (
+                        <motion.button
+                          variants={item}
+                          whileHover={{ y: -1, scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                          type="button"
+                          key={t}
+                          onClick={() => toggleTopic(t)}
+                          className={`rounded-full border px-4 py-2 text-sm transition ${
+                            active
+                              ? 'border-sky-300 bg-sky-50 text-sky-700 shadow-sm'
+                              : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          {t}
+                        </motion.button>
+                      )
+                    })}
+                  </motion.div>
+                </div>
+
+                {/* Action */}
+                <div className="mt-8 flex items-center justify-between gap-4">
+                  <div className="text-xs text-slate-500">Soft colors, animated cards, and icons for quick scanning</div>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={startLearning}
+                    disabled={!level || topics.length === 0 || loading}
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400 ${
+                      !level || topics.length === 0 || loading
+                        ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                        : 'bg-sky-600 text-white hover:bg-sky-700 shadow-sm'
+                    }`}
+                  >
+                    {loading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        Start Learning
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </motion.button>
                 </div>
               </div>
+            )}
 
-              {/* Action */}
-              <div className="mt-8 flex items-center justify-between gap-4">
-                <div className="text-xs text-slate-500">Soft colors, clean layout, focused reading</div>
-                <button
-                  onClick={startLearning}
-                  disabled={!level || topics.length === 0 || loading}
-                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400 ${
-                    !level || topics.length === 0 || loading
-                      ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                      : 'bg-sky-600 text-white hover:bg-sky-700 shadow-sm'
-                  }`}
-                >
-                  {loading ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      Start Learning
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
+            {/* Reading */}
+            {step === 2 && (
+              <div className="p-6 md:p-10">
+                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-lg bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700">Level {level}</span>
+                    {primaryTopic && (
+                      <span className="rounded-lg bg-sky-100 px-3 py-1 text-sm font-medium text-sky-700">{primaryTopic}</span>
+                    )}
+                  </div>
+                  <div className="text-sm text-slate-500">Approx. 180 words</div>
+                </motion.div>
 
-          {/* Reading */}
-          {step === 2 && (
-            <div className="p-6 md:p-10">
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="rounded-lg bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700">Level {level}</span>
-                  {primaryTopic && (
-                    <span className="rounded-lg bg-sky-100 px-3 py-1 text-sm font-medium text-sky-700">{primaryTopic}</span>
-                  )}
-                </div>
-                <div className="text-sm text-slate-500">Approx. 180 words</div>
-              </div>
+                <article className="prose prose-slate max-w-none">
+                  <motion.h2 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-4 font-semibold tracking-tight text-slate-800">Community Garden Morning</motion.h2>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="rounded-2xl bg-slate-50/80 p-6 ring-1 ring-slate-200">
+                    <p className="font-serif text-lg leading-8 text-slate-800">{PASSAGE}</p>
+                  </motion.div>
+                </article>
 
-              <article className="prose prose-slate max-w-none">
-                <h2 className="mb-4 font-semibold tracking-tight text-slate-800">Community Garden Morning</h2>
-                <div className="rounded-2xl bg-slate-50/80 p-6 ring-1 ring-slate-200">
-                  <p className="font-serif text-lg leading-8 text-slate-800">{PASSAGE}</p>
-                </div>
-              </article>
-
-              <div className="mt-8 flex justify-end">
-                <button
-                  onClick={() => setStep(3)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                >
-                  Take Quiz
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Quiz */}
-          {step === 3 && (
-            <div className="p-6 md:p-8">
-              {/* Progress */}
-              <div className="mb-6">
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-700">Quiz</span>
-                  <span className="text-slate-500">{Object.keys(answers).length}/{QUESTIONS.length} answered</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-sky-500 transition-all" style={{ width: `${progressValue}%` }} />
+                <div className="mt-8 flex justify-end">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setStep(3)}
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  >
+                    Take Quiz
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.button>
                 </div>
               </div>
+            )}
 
-              <div className="space-y-5">
-                {QUESTIONS.map((q, idx) => {
-                  const selected = answers[q.id]
-                  const isCorrect = submitted && selected === q.answerIndex
-                  const isWrong = submitted && selected !== undefined && selected !== q.answerIndex
+            {/* Quiz */}
+            {step === 3 && (
+              <div className="p-6 md:p-8">
+                {/* Progress */}
+                <div className="mb-6">
+                  <div className="mb-2 flex items-center justify-between text-sm">
+                    <span className="font-medium text-slate-700">Quiz</span>
+                    <span className="text-slate-500">{Object.keys(answers).length}/{QUESTIONS.length} answered</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                    <motion.div
+                      initial={false}
+                      animate={{ width: `${progressValue}%` }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 28 }}
+                      className="h-full rounded-full bg-sky-500"
+                    />
+                  </div>
+                </div>
 
-                  return (
-                    <div
-                      key={q.id}
-                      className={`rounded-xl border p-4 shadow-sm transition ${
-                        isCorrect
-                          ? 'border-emerald-300 bg-emerald-50'
-                          : isWrong
-                          ? 'border-rose-300 bg-rose-50'
-                          : 'border-slate-200 bg-white'
-                      }`}
-                    >
-                      <div className="mb-3 flex items-start justify-between gap-4">
-                        <p className="font-medium text-slate-800">{idx + 1}. {q.question}</p>
-                        {submitted && (
-                          isCorrect ? (
-                            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-rose-500" />
-                          )
-                        )}
-                      </div>
+                <motion.div variants={container} initial="hidden" animate="show" className="space-y-5">
+                  {QUESTIONS.map((q, idx) => {
+                    const selected = answers[q.id]
+                    const isCorrect = submitted && selected === q.answerIndex
+                    const isWrong = submitted && selected !== undefined && selected !== q.answerIndex
 
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {q.options.map((opt, i) => {
-                          const active = selected === i
-                          const correctChoice = submitted && i === q.answerIndex
-                          const wrongChoice = submitted && active && i !== q.answerIndex
+                    return (
+                      <motion.div
+                        variants={item}
+                        key={q.id}
+                        className={`rounded-xl border p-4 shadow-sm transition ${
+                          isCorrect
+                            ? 'border-emerald-300 bg-emerald-50'
+                            : isWrong
+                            ? 'border-rose-300 bg-rose-50'
+                            : 'border-slate-200 bg-white'
+                        }`}
+                      >
+                        <div className="mb-3 flex items-start justify-between gap-4">
+                          <p className="font-medium text-slate-800">{idx + 1}. {q.question}</p>
+                          {submitted && (
+                            isCorrect ? (
+                              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                            ) : (
+                              <XCircle className="h-5 w-5 text-rose-500" />
+                            )
+                          )}
+                        </div>
 
-                          return (
-                            <button
-                              key={i}
-                              onClick={() => !submitted && setAnswers((prev) => ({ ...prev, [q.id]: i }))}
-                              className={`rounded-lg border px-3 py-2 text-left text-sm transition ${
-                                correctChoice
-                                  ? 'border-emerald-400 bg-emerald-50'
-                                  : wrongChoice
-                                  ? 'border-rose-400 bg-rose-50'
-                                  : active
-                                  ? 'border-sky-300 bg-sky-50'
-                                  : 'border-slate-200 bg-white hover:bg-slate-50'
-                              }`}
-                            >
-                              {opt}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {q.options.map((opt, i) => {
+                            const active = selected === i
+                            const correctChoice = submitted && i === q.answerIndex
+                            const wrongChoice = submitted && active && i !== q.answerIndex
 
-              <div className="mt-6 flex items-center justify-between">
-                {!submitted ? (
-                  <p className="text-sm text-slate-500">Select one answer for each question, then submit to see feedback.</p>
-                ) : (
-                  <p className="text-sm font-medium text-slate-700">Score: {score}/{QUESTIONS.length}</p>
-                )}
+                            return (
+                              <motion.button
+                                whileHover={!submitted ? { scale: 1.01 } : {}}
+                                whileTap={!submitted ? { scale: 0.98 } : {}}
+                                key={i}
+                                onClick={() => !submitted && setAnswers((prev) => ({ ...prev, [q.id]: i }))}
+                                className={`rounded-lg border px-3 py-2 text-left text-sm transition ${
+                                  correctChoice
+                                    ? 'border-emerald-400 bg-emerald-50'
+                                    : wrongChoice
+                                    ? 'border-rose-400 bg-rose-50'
+                                    : active
+                                    ? 'border-sky-300 bg-sky-50'
+                                    : 'border-slate-200 bg-white hover:bg-slate-50'
+                                }`}
+                              >
+                                {opt}
+                              </motion.button>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </motion.div>
 
-                <div className="flex gap-3">
+                <div className="mt-6 flex items-center justify-between">
                   {!submitted ? (
-                    <button
-                      onClick={() => setSubmitted(true)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                    >
-                      Submit Answers
-                    </button>
+                    <p className="text-sm text-slate-500">Select one answer for each question, then submit to see feedback.</p>
                   ) : (
-                    <button
-                      onClick={() => setStep(4)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    >
-                      View Results
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm font-medium text-slate-700">Score: {score}/{QUESTIONS.length}</motion.p>
                   )}
+
+                  <div className="flex gap-3">
+                    {!submitted ? (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setSubmitted(true)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                      >
+                        Submit Answers
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setStep(4)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      >
+                        View Results
+                        <ArrowRight className="h-4 w-4" />
+                      </motion.button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Results */}
-          {step === 4 && (
-            <div className="p-6 md:p-10">
-              <div className="mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-6 ring-1 ring-black/5">
-                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
-                  <Sparkles className="h-4 w-4" />
-                  Great job!
+            {/* Results */}
+            {step === 4 && (
+              <div className="p-6 md:p-10">
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-6 ring-1 ring-black/5">
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
+                    <Sparkles className="h-4 w-4" />
+                    Great job!
+                  </div>
+                  <h3 className="text-2xl font-bold tracking-tight text-slate-800">You scored {score} out of {QUESTIONS.length}</h3>
+                  <p className="mt-1 text-sm text-slate-600">Level {level} • {primaryTopic || 'General'}</p>
+                </motion.div>
+
+                <div>
+                  <h4 className="mb-3 text-base font-semibold text-slate-800">Key Vocabulary</h4>
+                  <motion.div variants={container} initial="hidden" animate="show" className="grid gap-3 md:grid-cols-2">
+                    {VOCAB.map((v) => (
+                      <motion.div variants={item} key={v.word} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <p className="font-semibold text-slate-800">{v.word}</p>
+                        <p className="text-sm text-slate-600">{v.def}</p>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight text-slate-800">You scored {score} out of {QUESTIONS.length}</h3>
-                <p className="mt-1 text-sm text-slate-600">Level {level} • {primaryTopic || 'General'}</p>
-              </div>
 
-              <div>
-                <h4 className="mb-3 text-base font-semibold text-slate-800">Key Vocabulary</h4>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {VOCAB.map((v) => (
-                    <div key={v.word} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <p className="font-semibold text-slate-800">{v.word}</p>
-                      <p className="text-sm text-slate-600">{v.def}</p>
-                    </div>
-                  ))}
+                <div className="mt-8 flex items-center justify-between">
+                  <p className="text-sm text-slate-500">Want to explore another topic or level?</p>
+                  <motion.button
+                    whileHover={{ rotate: -3, scale: 1.02 }}
+                    whileTap={{ scale: 0.98, rotate: 0 }}
+                    onClick={resetAll}
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Try Another Topic
+                  </motion.button>
                 </div>
               </div>
-
-              <div className="mt-8 flex items-center justify-between">
-                <p className="text-sm text-slate-500">Want to explore another topic or level?</p>
-                <button
-                  onClick={resetAll}
-                  className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Try Another Topic
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Footer Hint */}
-        <div className="mx-auto mt-6 max-w-4xl text-center text-xs text-slate-500">
-          Designed with soft colors, rounded corners, and generous whitespace for calm learning.
-        </div>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mx-auto mt-6 max-w-4xl text-center text-xs text-slate-500">
+          Designed with soft colors, rounded corners, and gentle motion for calm learning.
+        </motion.div>
       </div>
     </div>
   )
