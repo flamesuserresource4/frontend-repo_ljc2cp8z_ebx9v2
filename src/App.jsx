@@ -11,6 +11,11 @@ import {
   Compass,
   Target,
   Rocket,
+  Plane,
+  Cpu,
+  Briefcase,
+  Heart,
+  Sun,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -21,7 +26,14 @@ const LEVELS = [
   { key: 'B2', label: 'B2', desc: 'Upper Intermediate', Icon: Rocket },
 ]
 
-const TOPICS = ['Travel', 'Technology', 'Business', 'Lifestyle', 'Health']
+// Topic definitions with icons
+const TOPIC_DEFS = [
+  { key: 'travel', label: 'Travel', Icon: Plane },
+  { key: 'technology', label: 'Technology', Icon: Cpu },
+  { key: 'business', label: 'Business', Icon: Briefcase },
+  { key: 'lifestyle', label: 'Lifestyle', Icon: Sun },
+  { key: 'health', label: 'Health', Icon: Heart },
+]
 
 const PASSAGE = `On a quiet Sunday morning, Mia decided to take a walk through the old neighborhood park. The air was cool, and the leaves moved softly in the wind. She noticed a small sign near the entrance that said, “Community Garden—Volunteers Welcome.” Curious, she followed the path and found a group of people planting herbs and vegetables. A friendly woman handed Mia a pair of gloves and asked if she wanted to help. Mia smiled and joined them.
 
@@ -99,7 +111,7 @@ const item = {
 function App() {
   const [step, setStep] = useState(1) // 1: Onboarding, 2: Reading, 3: Quiz, 4: Results
   const [level, setLevel] = useState(null)
-  const [topics, setTopics] = useState([])
+  const [topics, setTopics] = useState([]) // stores topic keys
   const [loading, setLoading] = useState(false)
 
   const [answers, setAnswers] = useState({}) // { [q.id]: index }
@@ -115,10 +127,11 @@ function App() {
     return Math.round((answered / QUESTIONS.length) * 100)
   }, [answers])
 
-  const primaryTopic = topics[0]
+  const primaryTopicKey = topics[0]
+  const primaryTopicLabel = TOPIC_DEFS.find((t) => t.key === primaryTopicKey)?.label
 
-  const toggleTopic = (t) => {
-    setTopics((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]))
+  const toggleTopic = (key) => {
+    setTopics((prev) => (prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key]))
   }
 
   const startLearning = () => {
@@ -201,7 +214,7 @@ function App() {
                             : 'group rounded-2xl border border-slate-200 bg-white p-0 shadow-sm hover:shadow-md'
                         }
                       >
-                        <div className="rounded-2xl bg-white p-4">
+                        <div className={`rounded-2xl bg-white p-4 ${active ? 'ring-1 ring-white/60' : ''}`}>
                           <div className="mb-3 flex items-center justify-between">
                             <div className={`inline-flex items-center gap-2 rounded-xl p-2 text-white ${secondaryGradient}`}>
                               <Icon className="h-4 w-4" />
@@ -222,23 +235,30 @@ function App() {
                 <div className="mt-8">
                   <p className="mb-3 text-sm font-medium text-slate-600">Pick one or more topics</p>
                   <motion.div variants={container} initial="hidden" animate="show" className="flex flex-wrap gap-2">
-                    {TOPICS.map((t) => {
-                      const active = topics.includes(t)
+                    {TOPIC_DEFS.map(({ key, label, Icon }) => {
+                      const active = topics.includes(key)
                       return (
                         <motion.button
                           variants={item}
                           whileHover={{ y: -1, scale: 1.03 }}
                           whileTap={{ scale: 0.98 }}
                           type="button"
-                          key={t}
-                          onClick={() => toggleTopic(t)}
-                          className={`rounded-full border px-4 py-2 text-sm transition ${
+                          key={key}
+                          onClick={() => toggleTopic(key)}
+                          className={`group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${
                             active
-                              ? 'border-orange-200 bg-orange-50 text-orange-600 shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                              ? `${secondaryGradient} text-white border-transparent shadow-md`
+                              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                           }`}
                         >
-                          {t}
+                          <span
+                            className={`grid h-5 w-5 place-items-center rounded-full ${
+                              active ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-500'
+                            }`}
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                          </span>
+                          {label}
                         </motion.button>
                       )
                     })}
@@ -246,14 +266,13 @@ function App() {
                 </div>
 
                 {/* Action */}
-                <div className="mt-8 flex items-center justify-between gap-4">
-                  <div className="text-xs text-slate-500">Modern gradient buttons and soft cards with playful icons</div>
+                <div className="mt-8 flex items-center justify-end gap-4">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={startLearning}
                     disabled={!level || topics.length === 0 || loading}
-                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition focus:outline-none ${
+                    className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white transition focus:outline-none ${
                       !level || topics.length === 0 || loading
                         ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
                         : `${primaryGradient} shadow-[0_10px_28px_rgba(255,140,102,0.22)]`
@@ -281,8 +300,8 @@ function App() {
                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <span className="rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600">Level {level}</span>
-                    {primaryTopic && (
-                      <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-600">{primaryTopic}</span>
+                    {primaryTopicLabel && (
+                      <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-600">{primaryTopicLabel}</span>
                     )}
                   </div>
                   <div className="text-sm text-slate-500">Approx. 180 words</div>
@@ -300,7 +319,7 @@ function App() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setStep(3)}
-                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
+                    className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
                   >
                     Take Quiz
                     <ArrowRight className="h-4 w-4" />
@@ -402,7 +421,7 @@ function App() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setSubmitted(true)}
-                        className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(255,140,102,0.22)]`}
+                        className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(255,140,102,0.22)]`}
                       >
                         Submit Answers
                       </motion.button>
@@ -411,7 +430,7 @@ function App() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setStep(4)}
-                        className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
+                        className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
                       >
                         View Results
                         <ArrowRight className="h-4 w-4" />
@@ -431,7 +450,7 @@ function App() {
                     Great job!
                   </div>
                   <h3 className="text-2xl font-bold tracking-tight">You scored {score} out of {QUESTIONS.length}</h3>
-                  <p className="mt-1 text-sm text-slate-700">Level {level} • {primaryTopic || 'General'}</p>
+                  <p className="mt-1 text-sm text-slate-700">Level {level} • {primaryTopicLabel || 'General'}</p>
                 </motion.div>
 
                 <div>
@@ -452,7 +471,7 @@ function App() {
                     whileHover={{ rotate: -3, scale: 1.02 }}
                     whileTap={{ scale: 0.98, rotate: 0 }}
                     onClick={resetAll}
-                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${secondaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
+                    className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white transition ${secondaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     Try Another Topic
@@ -462,11 +481,6 @@ function App() {
             )}
           </motion.div>
         </AnimatePresence>
-
-        {/* Footer Hint */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mx-auto mt-6 max-w-4xl text-center text-xs text-slate-500">
-          Modern gradient aesthetic with Coral → Teal accents and friendly rounded shapes.
-        </motion.div>
       </div>
     </div>
   )
