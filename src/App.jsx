@@ -15,10 +15,10 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 
 const LEVELS = [
-  { key: 'A1', label: 'A1', desc: 'Beginner', Icon: Sprout, color: 'emerald' },
-  { key: 'A2', label: 'A2', desc: 'Elementary', Icon: Compass, color: 'sky' },
-  { key: 'B1', label: 'B1', desc: 'Intermediate', Icon: Target, color: 'violet' },
-  { key: 'B2', label: 'B2', desc: 'Upper Intermediate', Icon: Rocket, color: 'amber' },
+  { key: 'A1', label: 'A1', desc: 'Beginner', Icon: Sprout },
+  { key: 'A2', label: 'A2', desc: 'Elementary', Icon: Compass },
+  { key: 'B1', label: 'B1', desc: 'Intermediate', Icon: Target },
+  { key: 'B2', label: 'B2', desc: 'Upper Intermediate', Icon: Rocket },
 ]
 
 const TOPICS = ['Travel', 'Technology', 'Business', 'Lifestyle', 'Health']
@@ -138,20 +138,26 @@ function App() {
     setLoading(false)
   }
 
+  // Gradient tokens
+  const primaryGradient = 'bg-gradient-to-br from-[#FF8C66] to-[#3ECFBF]'
+  const secondaryGradient = 'bg-gradient-to-br from-[#3ECFBF] to-[#FF8C66]'
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 text-slate-800">
+    <div className="min-h-screen bg-slate-50 text-slate-800">
       <div className="mx-auto max-w-4xl px-4 py-10 md:py-14">
         {/* Header */}
         <header className="mb-8 flex items-center justify-between">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex items-center gap-3">
-            <div className="rounded-xl bg-sky-100 p-2 text-sky-600 shadow-sm"><GraduationCap className="h-6 w-6" /></div>
+            <div className={`rounded-2xl p-2 text-white shadow-[0_10px_30px_rgba(62,207,191,0.25)] ${secondaryGradient}`}><GraduationCap className="h-6 w-6" /></div>
             <div>
               <h1 className="text-xl font-semibold tracking-tight">English Reader</h1>
               <p className="text-sm text-slate-500">Personalized reading, simple practice</p>
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }} className="hidden md:flex items-center gap-2 text-sky-600">
-            <Sparkles className="h-5 w-5" />
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }} className="hidden md:flex items-center gap-2 text-slate-600">
+            <div className={`rounded-full p-1.5 text-white ${secondaryGradient}`}>
+              <Sparkles className="h-5 w-5" />
+            </div>
             <span className="text-sm">Learn by reading</span>
           </motion.div>
         </header>
@@ -164,25 +170,23 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.35 }}
-            className="rounded-2xl bg-white/80 shadow-xl ring-1 ring-black/5 backdrop-blur-sm"
+            className="rounded-3xl bg-white shadow-md ring-1 ring-black/5"
           >
             {/* Onboarding */}
             {step === 1 && (
               <div className="p-6 md:p-8">
                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6 flex items-center gap-3">
-                  <BookOpen className="h-6 w-6 text-emerald-600" />
-                  <h2 className="text-lg font-semibold">Choose your level and topics</h2>
+                  <div className={`rounded-xl p-1.5 text-white ${secondaryGradient}`}>
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-slate-800">Choose your level and topics</h2>
                 </motion.div>
 
                 {/* Levels */}
                 <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {LEVELS.map((l, idx) => {
+                  {LEVELS.map((l) => {
                     const active = level === l.key
                     const Icon = l.Icon
-                    const color = l.color
-                    const colorBg = active ? `bg-${color}-50` : 'bg-white'
-                    const colorBorder = active ? `border-${color}-300` : 'border-slate-200'
-                    const colorPill = active ? `bg-${color}-100 text-${color}-700` : 'bg-slate-100 text-slate-600'
 
                     return (
                       <motion.button
@@ -191,15 +195,23 @@ function App() {
                         whileTap={{ scale: 0.98 }}
                         key={l.key}
                         onClick={() => setLevel(l.key)}
-                        className={`group rounded-xl border p-4 text-left transition shadow-sm hover:shadow-md ${colorBorder} ${colorBg}`}
+                        className={
+                          active
+                            ? `group rounded-2xl p-[2px] shadow-[0_10px_30px_rgba(255,140,102,0.18)] ${primaryGradient}`
+                            : 'group rounded-2xl border border-slate-200 bg-white p-0 shadow-sm hover:shadow-md'
+                        }
                       >
-                        <div className={`mb-3 inline-flex items-center gap-2 rounded-lg px-2 py-1 text-xs ${colorPill}`}>
-                          <Icon className="h-4 w-4" />
-                          {l.desc}
-                        </div>
-                        <div className="flex items-end justify-between">
-                          <span className="text-2xl font-bold tracking-tight">{l.label}</span>
-                          <span className={`text-xs ${active ? `text-${color}-600` : 'text-slate-400'}`}>CEFR</span>
+                        <div className="rounded-2xl bg-white p-4">
+                          <div className="mb-3 flex items-center justify-between">
+                            <div className={`inline-flex items-center gap-2 rounded-xl p-2 text-white ${secondaryGradient}`}>
+                              <Icon className="h-4 w-4" />
+                              <span className="text-xs font-medium">{l.desc}</span>
+                            </div>
+                            <span className={`text-xs ${active ? 'text-slate-700' : 'text-slate-400'}`}>CEFR</span>
+                          </div>
+                          <div className="flex items-end justify-between">
+                            <span className="text-2xl font-bold tracking-tight text-slate-800">{l.label}</span>
+                          </div>
                         </div>
                       </motion.button>
                     )
@@ -222,7 +234,7 @@ function App() {
                           onClick={() => toggleTopic(t)}
                           className={`rounded-full border px-4 py-2 text-sm transition ${
                             active
-                              ? 'border-sky-300 bg-sky-50 text-sky-700 shadow-sm'
+                              ? 'border-orange-200 bg-orange-50 text-orange-600 shadow-sm'
                               : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                           }`}
                         >
@@ -235,16 +247,16 @@ function App() {
 
                 {/* Action */}
                 <div className="mt-8 flex items-center justify-between gap-4">
-                  <div className="text-xs text-slate-500">Soft colors, animated cards, and icons for quick scanning</div>
+                  <div className="text-xs text-slate-500">Modern gradient buttons and soft cards with playful icons</div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={startLearning}
                     disabled={!level || topics.length === 0 || loading}
-                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400 ${
+                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition focus:outline-none ${
                       !level || topics.length === 0 || loading
                         ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                        : 'bg-sky-600 text-white hover:bg-sky-700 shadow-sm'
+                        : `${primaryGradient} shadow-[0_10px_28px_rgba(255,140,102,0.22)]`
                     }`}
                   >
                     {loading ? (
@@ -268,9 +280,9 @@ function App() {
               <div className="p-6 md:p-10">
                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-6 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="rounded-lg bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700">Level {level}</span>
+                    <span className="rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-600">Level {level}</span>
                     {primaryTopic && (
-                      <span className="rounded-lg bg-sky-100 px-3 py-1 text-sm font-medium text-sky-700">{primaryTopic}</span>
+                      <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-600">{primaryTopic}</span>
                     )}
                   </div>
                   <div className="text-sm text-slate-500">Approx. 180 words</div>
@@ -278,7 +290,7 @@ function App() {
 
                 <article className="prose prose-slate max-w-none">
                   <motion.h2 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mb-4 font-semibold tracking-tight text-slate-800">Community Garden Morning</motion.h2>
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="rounded-2xl bg-slate-50/80 p-6 ring-1 ring-slate-200">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 shadow-sm">
                     <p className="font-serif text-lg leading-8 text-slate-800">{PASSAGE}</p>
                   </motion.div>
                 </article>
@@ -288,7 +300,7 @@ function App() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setStep(3)}
-                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
                   >
                     Take Quiz
                     <ArrowRight className="h-4 w-4" />
@@ -311,7 +323,7 @@ function App() {
                       initial={false}
                       animate={{ width: `${progressValue}%` }}
                       transition={{ type: 'spring', stiffness: 200, damping: 28 }}
-                      className="h-full rounded-full bg-sky-500"
+                      className={`h-full rounded-full ${primaryGradient}`}
                     />
                   </div>
                 </div>
@@ -326,11 +338,11 @@ function App() {
                       <motion.div
                         variants={item}
                         key={q.id}
-                        className={`rounded-xl border p-4 shadow-sm transition ${
+                        className={`rounded-2xl border p-4 shadow-sm transition ${
                           isCorrect
-                            ? 'border-emerald-300 bg-emerald-50'
+                            ? 'border-teal-300 bg-teal-50'
                             : isWrong
-                            ? 'border-rose-300 bg-rose-50'
+                            ? 'border-orange-300 bg-orange-50'
                             : 'border-slate-200 bg-white'
                         }`}
                       >
@@ -338,9 +350,9 @@ function App() {
                           <p className="font-medium text-slate-800">{idx + 1}. {q.question}</p>
                           {submitted && (
                             isCorrect ? (
-                              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                              <CheckCircle2 className="h-5 w-5 text-teal-600" />
                             ) : (
-                              <XCircle className="h-5 w-5 text-rose-500" />
+                              <XCircle className="h-5 w-5 text-orange-500" />
                             )
                           )}
                         </div>
@@ -357,13 +369,13 @@ function App() {
                                 whileTap={!submitted ? { scale: 0.98 } : {}}
                                 key={i}
                                 onClick={() => !submitted && setAnswers((prev) => ({ ...prev, [q.id]: i }))}
-                                className={`rounded-lg border px-3 py-2 text-left text-sm transition ${
+                                className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
                                   correctChoice
-                                    ? 'border-emerald-400 bg-emerald-50'
+                                    ? 'border-teal-400 bg-teal-50'
                                     : wrongChoice
-                                    ? 'border-rose-400 bg-rose-50'
+                                    ? 'border-orange-400 bg-orange-50'
                                     : active
-                                    ? 'border-sky-300 bg-sky-50'
+                                    ? 'border-orange-300 bg-orange-50'
                                     : 'border-slate-200 bg-white hover:bg-slate-50'
                                 }`}
                               >
@@ -390,7 +402,7 @@ function App() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setSubmitted(true)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(255,140,102,0.22)]`}
                       >
                         Submit Answers
                       </motion.button>
@@ -399,7 +411,7 @@ function App() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setStep(4)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${primaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
                       >
                         View Results
                         <ArrowRight className="h-4 w-4" />
@@ -413,20 +425,20 @@ function App() {
             {/* Results */}
             {step === 4 && (
               <div className="p-6 md:p-10">
-                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-6 ring-1 ring-black/5">
-                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className={`mb-8 rounded-3xl p-6 ring-1 ring-black/5 text-slate-800 ${secondaryGradient} bg-opacity-10`}> 
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-teal-700 ring-1 ring-white/50">
                     <Sparkles className="h-4 w-4" />
                     Great job!
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight text-slate-800">You scored {score} out of {QUESTIONS.length}</h3>
-                  <p className="mt-1 text-sm text-slate-600">Level {level} • {primaryTopic || 'General'}</p>
+                  <h3 className="text-2xl font-bold tracking-tight">You scored {score} out of {QUESTIONS.length}</h3>
+                  <p className="mt-1 text-sm text-slate-700">Level {level} • {primaryTopic || 'General'}</p>
                 </motion.div>
 
                 <div>
                   <h4 className="mb-3 text-base font-semibold text-slate-800">Key Vocabulary</h4>
                   <motion.div variants={container} initial="hidden" animate="show" className="grid gap-3 md:grid-cols-2">
                     {VOCAB.map((v) => (
-                      <motion.div variants={item} key={v.word} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <motion.div variants={item} key={v.word} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                         <p className="font-semibold text-slate-800">{v.word}</p>
                         <p className="text-sm text-slate-600">{v.def}</p>
                       </motion.div>
@@ -440,7 +452,7 @@ function App() {
                     whileHover={{ rotate: -3, scale: 1.02 }}
                     whileTap={{ scale: 0.98, rotate: 0 }}
                     onClick={resetAll}
-                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition ${secondaryGradient} shadow-[0_10px_28px_rgba(62,207,191,0.22)]`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     Try Another Topic
@@ -453,7 +465,7 @@ function App() {
 
         {/* Footer Hint */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mx-auto mt-6 max-w-4xl text-center text-xs text-slate-500">
-          Designed with soft colors, rounded corners, and gentle motion for calm learning.
+          Modern gradient aesthetic with Coral → Teal accents and friendly rounded shapes.
         </motion.div>
       </div>
     </div>
